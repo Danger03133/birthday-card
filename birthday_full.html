@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday</title>
+<style>
+    body {
+        margin: 0;
+        font-family: sans-serif;
+        background: #f7f7f7;
+        overflow-x: hidden;
+    }
+
+    .center {
+        text-align: center;
+        padding: 20px;
+    }
+
+    #cakePopup {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 999;
+        display: none;
+    }
+
+    #cakePopup img {
+        max-width: 80%;
+        border-radius: 20px;
+    }
+
+    .message-box {
+        max-width: 600px;
+        margin: 40px auto;
+        background: white;
+        padding: 20px;
+        border-radius: 18px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .footer-right {
+        text-align: right;
+        font-weight: bold;
+        margin-top: 20px;
+        font-size: 18px;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    #finalImage {
+        max-width: 90%;
+        border-radius: 20px;
+        margin: 20px auto;
+        display: block;
+    }
+
+    .btn {
+        padding: 12px 20px;
+        background: #ff6bb5;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 18px;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+
+</style>
+</head>
+<body>
+
+<div class="center">
+    <button class="btn" onclick="showCake()">اضغط لبدء المفاجأة 🎉</button>
+</div>
+
+<div id="cakePopup">
+    <img id="cakeImg" src="cake.png" alt="Cake">
+</div>
+
+<img id="finalImage" class="hidden" src="birthday_photo.jpg" alt="Birthday Photo">
+
+<div id="message" class="message-box hidden">
+    <p>💕🫂Happy birthday, dear🫂💕<br><br>
+هَنِيئًا لَكَ العِيدُ الَّذِي أَنتَ عِيدُهُ<br>
+وَأَنتَ مِن فَيْضِ البَهَاءِ تَزِيدُهُ<br>
+وَإِنِّي إِذَا أَهْدَاكَ غَيْرِي وَرْدَةً<br>
+سَأُهدِيكَ قَلَبًا أَنتَ فِيهِ وَرِيدُهُ<br><br>
+My dearest, my heart, my most precious possession..✨<br><br>
+Happy birthday, my dear. I always hope you are in good health and well-being. I met you this year and thanks to you it became the best year of my life..🌸💕<br><br>
+الله يحفظك ويخليك ليا ويدوم صحبتنا وصداقتنا..🙏🏻<br><br>
+تذكر دييييما بلي عندك بنادم يهتم بامرك ويحبك لابعد ماتتصور…🥹❤️<br><br>
+Я люблю тебя на всех языках мира, моя дорогая..🥀🫀</p>
+
+    <div class="footer-right">زنجوجك الوفي ~</div>
+</div>
+
+<script>
+function showCake() {
+    document.getElementById("cakePopup").style.display = "flex";
+    startMic();
+}
+
+function startMic() {
+    if (!navigator.mediaDevices) return;
+
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const mic = audioContext.createMediaStreamSource(stream);
+        const analyser = audioContext.createAnalyser();
+        analyser.fftSize = 256;
+        mic.connect(analyser);
+
+        const data = new Uint8Array(analyser.frequencyBinCount);
+
+        function detectBlow() {
+            analyser.getByteFrequencyData(data);
+            let volume = data.reduce((a,b)=>a+b) / data.length;
+
+            if (volume > 70) { 
+                showFinal();
+                stream.getTracks().forEach(t => t.stop());
+            } else {
+                requestAnimationFrame(detectBlow);
+            }
+        }
+        detectBlow();
+    });
+}
+
+function showFinal() {
+    document.getElementById("cakePopup").style.display = "none";
+    document.getElementById("finalImage").classList.remove("hidden");
+    document.getElementById("message").classList.remove("hidden");
+    fireworks();
+}
+
+function fireworks() {
+    for (let i = 0; i < 80; i++) {
+        let conf = document.createElement("div");
+        conf.style.position = "fixed";
+        conf.style.width = "8px";
+        conf.style.height = "8px";
+        conf.style.background = `hsl(${Math.random()*360},100%,50%)`;
+        conf.style.top = "-10px";
+        conf.style.left = Math.random()*100 + "%";
+        conf.style.borderRadius = "50%";
+        conf.style.transition = "3s";
+        document.body.appendChild(conf);
+        setTimeout(()=>{
+            conf.style.top = "110%";
+            conf.style.opacity = 0;
+        },20);
+        setTimeout(()=>conf.remove(), 3200);
+    }
+}
+</script>
+
+</body>
+</html>
